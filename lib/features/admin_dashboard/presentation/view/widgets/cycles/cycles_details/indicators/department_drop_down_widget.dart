@@ -1,0 +1,110 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../../../../../routing/all_routes_imports.dart';
+
+class DepartmentDropDownWidget extends StatefulWidget {
+  final bool isDisabled;
+  const DepartmentDropDownWidget({super.key, this.isDisabled = false});
+
+  @override
+  State<DepartmentDropDownWidget> createState() =>
+      _DepartmentDropDownWidgetState();
+}
+
+class _DepartmentDropDownWidgetState extends State<DepartmentDropDownWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final cubit = DepartmentCubit.get(context);
+    if (cubit.departments.isEmpty) {
+      cubit.fetchDepartments();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DepartmentCubit, DepartmentState>(
+      builder: (context, state) {
+        if (state is DepartmentLoading) {
+          return const CustomLoading();
+        }
+        if (state is DepartmentError) {
+          return RetryWidget(
+            title: state.message,
+            onPressed: () {
+              DepartmentCubit.get(context).fetchDepartments();
+            },
+          );
+        }
+        if (state is DepartmentSuccess) {
+          final departmentCubit = DepartmentCubit.get(context);
+          final departments = state.departments;
+          final isValid = departments.any(
+            (e) => e.id == state.selectedDepartment?.id,
+          );
+          return Container(
+            height: 45.h,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: widget.isDisabled ? Colors.grey.shade100 : AppColors.white,
+              border: Border.all(color: const Color(0xFFCCCCCC)),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<int?>(
+                value: isValid ? state.selectedDepartment?.id : null,
+                isExpanded: true,
+                hint: Text(
+                  'selectTheDepartment'.tr(),
+                  style: TextStyle(
+                    color: widget.isDisabled ? Colors.grey : null,
+                  ),
+                ),
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 20.sp,
+                  color: widget.isDisabled ? Colors.grey : null,
+                ),
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  color: widget.isDisabled
+                      ? Colors.grey
+                      : const Color(0xFF333333),
+                ),
+                items: departments
+                    .map(
+                      (department) => DropdownMenuItem<int?>(
+                        value: department.id,
+                        child: Text(
+                          department.name.tr(),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    )
+                    .toList(),
+                onChanged: widget.isDisabled
+                    ? null
+                    : (value) {
+                        if (value == null) {
+                          departmentCubit.selectDepartment(department: null);
+                          return;
+                        }
+                        final selectedModel = state.departments.firstWhere(
+                          (d) => d.id == value,
+                        );
+                        departmentCubit.selectDepartment(
+                          department: selectedModel,
+                        );
+                      },
+              ),
+            ),
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
+}

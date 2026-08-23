@@ -1,0 +1,13 @@
+class KeysTexts {
+  static const String refreshToken = "refreshToken";
+  static const String token = "token";
+  static const String refreshTokenExpiration = "refreshTokenExpiration";
+  static const String lang = "lang";
+  static const String theme = "theme";
+  static const String userPassword = "user_password";
+  static const String preferredLanguages = "preferred_languages";
+  static const String onboardingShown = "onboarding_shown";
+  static const String meModel = "me_model";
+  static const String appVersion = "app_version";
+  static const String accessTokenExpiration = "accessTokenExpiration";
+}

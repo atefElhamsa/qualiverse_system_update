@@ -1,0 +1,21 @@
+import 'package:flutter/material.dart';
+import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
+
+class WhiteContainerWidget extends StatelessWidget {
+  const WhiteContainerWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      width: screenWidth / 2.06,
+      height: screenHeight,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor == AppColors.white
+            ? AppColors.whiteGrey.withOpacity(0.90)
+            : AppColors.mainBlack,
+      ),
+    );
+  }
+}

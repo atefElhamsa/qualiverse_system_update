@@ -1,0 +1,128 @@
+import 'package:flutter/material.dart';
+
+// ! Defines the color palette for the application.
+class AppColors {
+  // General colors
+  static const Color red = Colors.red;
+  static const Color mainBlack = Colors.black;
+  static const Color black26 = Colors.black26;
+  static const Color black87 = Colors.black87;
+  static const Color transparent = Colors.transparent;
+  static const Color white = Colors.white;
+  static const Color green = Colors.green;
+  static const Color redAccent = Colors.redAccent;
+  static const Color orange = Colors.orange;
+  static const Color mainGrey = Colors.grey;
+  static const Color yellow = Colors.yellow;
+
+  // Login screen specific colors
+  static const Color loginBackground1 = Color(0XFFBDCAE5);
+  static const Color loginBackground2 = Color(0XFF76AAFF);
+  static const Color whiteGrey = Color(0XFFF3F4F6);
+  static const Color greyIcon = Color(0XFF646773);
+  static const Color colorTapAdminDashboard = Color(0XFFF1F5FF);
+  static const Color blue = Color(0XFF2F6FED);
+  static const Color plotAreaBackgroundColor = Color(0xFFF0F4FA);
+  static const Color plotAreaBorderColor = Color(0xFFCCCCCC);
+  static const Color minorGridLines = Color(0xFFE8E8E8);
+  static const Color tooltipBehavior = Color(0xFF1a3a6b);
+  static const Color gradiant = Color(0xFF2d6bcf);
+
+  // Theme specific colors
+  static const Color black = Color(0XFF111827);
+  static const Color grey = Color(0XFFD9D9D9);
+  static const Color greyLight = Color(0XFF9CA3AF);
+  static const Color redLight = Color(0XFFEF5350);
+  static const Color drColor = Color(0XFF1F2B6C);
+  static const Color drInfoColor = Color(0XFFBFD2F8);
+
+  // Button colors
+  static const Color colorButtonLight = Color(0XFF1E3A8A);
+  static const Color colorButtonDark = Color(0xFF2D2D2D);
+  static const Color progressColor = Color(0XFF3B82F6);
+  static const Color aiModelColor = Color(0XFF7C7D7E);
+  static const Color loginButtonColor = Color(0XFF118DFF);
+  static const Color descResetColor = Color(0XFF9C9CA4);
+
+  // Text field colors
+  static const Color textFieldDark = Color(0xFF374151);
+
+  // Scaffold colors
+  static const Color scaffoldLight1 = Color(0xFF3B82F6);
+
+  //Main Wrapper colors
+  static const Color mainWrapperDark1 = Color(0xFF1E1E1E);
+
+  // Sidebar Item image colors
+  static const Color sideBarItemDark = Color(0xFFF3F4F6);
+
+  // Side Bar Text colors
+  static const Color sideBarTextLight = Color(0xFFFFFFFF);
+  static const Color sideBarTextDark = Color(0xFF000000);
+  static const Color selectedItemColor1 = Color(0xFF4FA3E3);
+  static const Color selectedItemColor2 = Color(0xFFA7D3F5);
+  static const Color customContainerSettingColor = Color(0xFFE1E2FF);
+
+  // custom container colors
+  static const Color customContainerLightHover = Color.fromARGB(
+    255,
+    231,
+    234,
+    236,
+  );
+  static const Color customContainerDarkHover = Color.fromARGB(255, 6, 43, 71);
+
+  // Hover Button colors
+  static const Color hoverButtonAccreditation = Color(0xFF3B82F6);
+  static const Color hoverButtonNewButton = Color(0xFF3B82F6);
+  static const Color hoverButtonAiModel = Color(0xFF9CA3AF);
+
+  // Course Module colors for Table of Contents
+  static const Color tableColor = Color(0xFFD9D9D9);
+  static const Color tableCircleAvatar = Color(0xFF3B82F6);
+
+  static const Color noFileColor = Color(0xFF10B981);
+
+  // button colors for accreditation list
+  static const Color buttonUploadFileHovered = Color(0xFF3B82F6);
+
+  // Splash Screen colors
+  static const Color splashBackground1 = Color(0xFFBDCAE5);
+  static const Color splashBackground2 = Color(0xFF76AAFF);
+
+  // Splash Screen Line colors
+  static const Color splashLineLight2 = Color(0xFF3B82F6);
+  static const Color viewAndDeleteIconColor = Color(0xFF0D99FF);
+  static const Color itemContainerColorEdit1 = Color(0xFF0F8BED);
+  static const Color itemContainerColorEdit2 = Color(0xFF080F24);
+
+  static const Color reviewedColor = Color(0xFF42A5F5);
+  static const Color approvedColor = Color(0xFF1A1A2E);
+  static const Color rejectedColor = Color(0xFFEF5350);
+  static const Color pendingColor = Color(0xFF9C27B0);
+  static const Color textGrey = Color(0xFF666666);
+  static const Color textBlack = Color(0xFF444444);
+  static const Color evidenceColorSlide = Color(0xFF7EB6F0);
+  static const Color evidenceColorSlide2 = Color(0xFF4472C4);
+  static const Color evidenceColorSlide3 = Color(0xFFE84545);
+  static const Color evidenceColorSlide4 = Color(0xFF7B2FBE);
+  static const Color approvedColorIndicator = Color(0xFF22C55E);
+  static const Color pendingColorIndicator = Color(0xFFF59E0B);
+  static const Color rejectedColorIndicator = Color(0xFFEF4444);
+  static const Color textGreyIndicator = Color(0xFF1F2937);
+  static const Color bgColor = Color(0xFFD6E4F0);
+  static const Color headerBgColor = Color(0xFFB0BEC5);
+  static const Color borderColor = Color(0xFFBBBBBB);
+  static const Color dividerColor = Color(0xFFEEEEEE);
+  static const Color completedColor = Color(0xFF2ECC71);
+  static const Color inProgressColor = Color(0xFFF0A500);
+
+  // AI Description specific colors
+  static const Color aiPrimary = Color(0xFF2E4596);
+  static const Color aiTitle = Color(0xFF0F172A);
+  static const Color aiPdf = Color(0xFFE53935);
+  static const Color aiDocx = Color(0xFF1976D2);
+  static const Color aiSuccess = Color(0xFF10B981);
+  static const Color aiBorder = Color(0xFFF1F5F9);
+  static const Color aiBoxBg = Color(0xFFF9FAFB);
+}

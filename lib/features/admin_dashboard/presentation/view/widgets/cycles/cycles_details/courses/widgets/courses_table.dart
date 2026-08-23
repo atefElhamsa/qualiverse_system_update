@@ -1,0 +1,37 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+class CoursesTable extends StatelessWidget {
+  final List<CourseItemModel> courses;
+  const CoursesTable({super.key, required this.courses});
+
+  @override
+  Widget build(BuildContext context) {
+    if (courses.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.h),
+          child: CustomText(
+            title: 'noCoursesAvailable'.tr(),
+            textStyle: Theme.of(context).textTheme.headlineLarge!,
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        const CoursesHeader(),
+        ...courses.asMap().entries.map(
+          (entry) => CoursesRowWidget(
+            course: entry.value,
+            index: entry.key,
+            total: courses.length,
+          ),
+        ),
+      ],
+    );
+  }
+}

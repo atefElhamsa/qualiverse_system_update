@@ -1,0 +1,140 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qualiverse_system/core/shared_widgets/custom_base_drop_down.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+
+class CoursesDepartmentDropDownWidget extends StatefulWidget {
+  final double? height;
+  final bool isExpanded;
+  final ValueChanged<int>? onChanged;
+  final int? selectedId;
+  final bool useCubitSelection;
+  final bool? isDisabled;
+  final bool allowAnyDepartment;
+  const CoursesDepartmentDropDownWidget({
+    super.key,
+    this.height,
+    this.isExpanded = true,
+    this.onChanged,
+    this.selectedId,
+    this.useCubitSelection = true,
+    this.isDisabled,
+    this.allowAnyDepartment = false,
+  });
+
+  @override
+  State<CoursesDepartmentDropDownWidget> createState() =>
+      _CoursesDepartmentDropDownWidgetState();
+}
+
+class _CoursesDepartmentDropDownWidgetState
+    extends State<CoursesDepartmentDropDownWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final cubit = DepartmentCubit.get(context);
+    if (cubit.departments.isEmpty) {
+      cubit.fetchDepartments();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DepartmentCubit, DepartmentState>(
+      builder: (context, state) {
+        if (state is DepartmentLoading) {
+          return CustomBaseDropDown<DepartmentModel>(
+            items: const [],
+            itemLabelBuilder: (d) => '',
+            itemValueBuilder: (d) => 0,
+            hint: 'Loading...',
+            isLoading: true,
+            height: widget.height,
+            isExpanded: widget.isExpanded,
+          );
+        }
+        if (state is DepartmentSuccess) {
+          return BlocBuilder<LevelCubit, LevelState>(
+            builder: (context, levelState) {
+              bool isDisabled = widget.isDisabled ?? false;
+
+              final level = levelState is LevelSuccess
+                  ? levelState.selectedLevel
+                  : null;
+              final bool isLevel1Or2 = level != null && level.levelNumber <= 2;
+
+              final departments = state.departments;
+
+              final List<DepartmentModel> dropdownItems = [];
+              if (isLevel1Or2) {
+                dropdownItems.add(
+                  DepartmentModel(id: -1, code: '', name: 'noSelect'.tr()),
+                );
+              }
+              dropdownItems.addAll(departments);
+
+              final isValid = dropdownItems.any(
+                (e) => e.id == state.selectedDepartment?.id,
+              );
+              final selectedValue =
+                  widget.selectedId ??
+                  (widget.useCubitSelection && isValid
+                      ? state.selectedDepartment?.id
+                      : null);
+              final selectedItem =
+                  dropdownItems
+                      .where((d) => d.id == selectedValue)
+                      .firstOrNull ??
+                  (isLevel1Or2 ? dropdownItems.first : null);
+
+              return CustomBaseDropDown<DepartmentModel>(
+                items: dropdownItems,
+                itemLabelBuilder: (d) => d.name,
+                itemValueBuilder: (d) => d.id,
+                value: selectedItem,
+                hint: 'selectTheDepartment'.tr(),
+                height: widget.height,
+                isExpanded: widget.isExpanded,
+                isDisabled: isDisabled,
+                isItemDisabled: (item) {
+                  if (widget.allowAnyDepartment) return false;
+                  if (item.id == -1) return false;
+                  if (!isLevel1Or2) return false;
+                  final lower = item.name.toLowerCase();
+                  final isDataAnalysis =
+                      lower.contains("data analysis") ||
+                      lower.contains("تحليل البيانات");
+                  return !isDataAnalysis;
+                },
+                onChanged: (value) {
+                  if (value == null) return;
+                  if (value == -1) {
+                    DepartmentCubit.get(
+                      context,
+                    ).selectDepartment(department: null);
+                    if (widget.onChanged != null) {
+                      widget.onChanged!(-1);
+                    }
+                    return;
+                  }
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(value as int);
+                    return;
+                  }
+                  final selectedModel = departments.firstWhere(
+                    (d) => d.id == value,
+                  );
+                  DepartmentCubit.get(
+                    context,
+                  ).selectDepartment(department: selectedModel);
+                },
+              );
+            },
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
+}

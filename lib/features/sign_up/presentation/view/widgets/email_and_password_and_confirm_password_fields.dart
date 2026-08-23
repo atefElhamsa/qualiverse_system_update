@@ -1,0 +1,80 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
+import 'package:qualiverse_system/features/all_features_imports/all_features_imports.dart';
+
+class EmailAndPasswordAndConfirmPasswordFields extends StatelessWidget {
+  const EmailAndPasswordAndConfirmPasswordFields({
+    super.key,
+    required this.signUpCubit,
+  });
+
+  final SignUpCubit signUpCubit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        UsernameAndEmailField(signUpCubit: signUpCubit),
+        const SizedBox(height: 25),
+        SizedBox(
+          width: 410.w,
+          child: CustomTextFormField(
+            textFieldModel: TextFieldModel(
+              isObscured: true,
+              customTextLabel: CustomText(
+                title: "password".tr(),
+                textStyle: GoogleFonts.inter(
+                  fontSize: 13.sp,
+                  color: AppColors.aiModelColor,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              onFieldSubmitted: (submit) {
+                FocusScope.of(
+                  context,
+                ).requestFocus(signUpCubit.confirmPasswordNode);
+              },
+              hintText: "enterPassword".tr(),
+              controller: signUpCubit.passwordController,
+              focusNode: signUpCubit.passwordNode,
+              keyboardType: TextInputType.visiblePassword,
+              validator: (password) => MyValidators.passwordValidator(password),
+            ),
+          ),
+        ),
+        const SizedBox(height: 25),
+        SizedBox(
+          width: 410.w,
+          child: CustomTextFormField(
+            textFieldModel: TextFieldModel(
+              isObscured: true,
+              customTextLabel: CustomText(
+                title: "confirmPassword".tr(),
+                textStyle: GoogleFonts.inter(
+                  fontSize: 13.sp,
+                  color: AppColors.aiModelColor,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              onFieldSubmitted: (submit) {
+                signUpCubit.signUpCubit();
+              },
+              hintText: "enterConfirmPassword".tr(),
+              controller: signUpCubit.confirmPasswordController,
+              focusNode: signUpCubit.confirmPasswordNode,
+              keyboardType: TextInputType.visiblePassword,
+              validator: (confirmPassword) =>
+                  MyValidators.repeatPasswordValidator(
+                    value: confirmPassword?.trim(),
+                    password: signUpCubit.passwordController.text.trim(),
+                  ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

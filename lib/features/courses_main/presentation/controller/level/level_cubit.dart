@@ -1,0 +1,54 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../../routing/all_routes_imports.dart';
+
+class LevelCubit extends Cubit<LevelState> {
+  LevelCubit() : super(LevelInitial());
+
+  static LevelCubit get(BuildContext context) => BlocProvider.of(context);
+
+  List<LevelModel> levels = [];
+  LevelModel? selectedLevel;
+
+  void selectLevel({LevelModel? level}) {
+    selectedLevel = level;
+    emit(LevelSuccess(levels: levels, selectedLevel: selectedLevel));
+  }
+
+  Future<void> fetchLevels() async {
+    emit(LevelLoading());
+    try {
+      final data = await CoursesMainServices.getLevels();
+      levels = data;
+
+      if (selectedLevel != null) {
+        selectedLevel = levels.firstWhere(
+          (e) => e.id == selectedLevel!.id,
+          orElse: () => levels.isNotEmpty ? levels.first : levels.first,
+        );
+      } else if (levels.isNotEmpty) {
+        selectedLevel = levels.first;
+      }
+
+      emit(LevelSuccess(levels: levels, selectedLevel: selectedLevel));
+    } catch (e) {
+      final msg = e.toString().replaceFirst('Exception: ', '').trim();
+      if (msg.contains('No Internet')) {
+        emit(LevelError(message: 'Check your internet connection'));
+      } else if (msg.contains('Unauthorized')) {
+        await LoginStorage.clear();
+        reset();
+        emit(LevelError(message: 'Session expired, please login again'));
+      } else {
+        emit(LevelError(message: msg));
+      }
+    }
+  }
+
+  void reset() {
+    levels = [];
+    selectedLevel = null;
+    emit(LevelInitial());
+  }
+}

@@ -1,0 +1,661 @@
+import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+
+class WeekControllers {
+  final TextEditingController theoretical = TextEditingController(text: "2");
+  final TextEditingController training = TextEditingController(text: "2");
+  final TextEditingController selfLearning = TextEditingController(text: "4");
+  final TextEditingController other = TextEditingController(text: "0");
+
+  void dispose() {
+    theoretical.dispose();
+    training.dispose();
+    selfLearning.dispose();
+    other.dispose();
+  }
+}
+
+class AiDescriptionCubit extends Cubit<AiDescriptionState> {
+  AiDescriptionCubit() : super(AiDescriptionInitial()) {
+    _initControllers();
+  }
+
+  String? generationId;
+  bool isUploaded = false;
+  bool get isGenerationStarted => generationId != null;
+
+  int currentPage = 0;
+  int learningWeeksCount = 15;
+  List<WeekControllers> weekControllers = [];
+
+  void addLearningWeek() {
+    learningWeeksCount++;
+    weekControllers.add(WeekControllers());
+    emit(AiDescriptionWeeksUpdated());
+  }
+
+  void removeLearningWeek(int index) {
+    if (learningWeeksCount > 2) {
+      learningWeeksCount--;
+      weekControllers[index].dispose();
+      weekControllers.removeAt(index);
+      emit(AiDescriptionWeeksUpdated());
+    }
+  }
+
+  // Basic Info Controllers
+  late TextEditingController titleController;
+  late TextEditingController codeController;
+  late TextEditingController deptController;
+  late TextEditingController typeController;
+  late TextEditingController levelController;
+  late TextEditingController programController;
+  late TextEditingController facultyController;
+  late TextEditingController uniController;
+  late TextEditingController coordinatorController;
+  late TextEditingController dateController;
+
+  // Resources Controllers
+  late TextEditingController mainRefController;
+  late TextEditingController otherRefsController;
+  late TextEditingController electronicController;
+  late TextEditingController platformsController;
+  late TextEditingController otherResController;
+
+  // Facilities Controllers
+  late TextEditingController devicesController;
+  late TextEditingController suppliesController;
+  late TextEditingController softwareController;
+  late TextEditingController labsController;
+  late TextEditingController virtualLabsController;
+  late TextEditingController otherFacController;
+
+  // Schedule Controller
+  late TextEditingController descriptionController;
+  late TextEditingController totalHoursController;
+
+  void _initControllers() {
+    titleController = TextEditingController();
+    codeController = TextEditingController();
+    deptController = TextEditingController();
+    typeController = TextEditingController();
+    levelController = TextEditingController();
+    programController = TextEditingController();
+    facultyController = TextEditingController();
+    uniController = TextEditingController();
+    coordinatorController = TextEditingController();
+    dateController = TextEditingController();
+
+    mainRefController = TextEditingController();
+    otherRefsController = TextEditingController();
+    electronicController = TextEditingController();
+    platformsController = TextEditingController();
+    otherResController = TextEditingController();
+
+    devicesController = TextEditingController();
+    suppliesController = TextEditingController();
+    softwareController = TextEditingController();
+    labsController = TextEditingController();
+    virtualLabsController = TextEditingController();
+    otherFacController = TextEditingController();
+
+    totalHoursController = TextEditingController(text: "3");
+    descriptionController = TextEditingController();
+
+    // Init first 2 weeks controllers
+    weekControllers = [];
+    for (int i = 0; i < learningWeeksCount; i++) {
+      weekControllers.add(WeekControllers());
+    }
+  }
+
+  void nextPage() {
+    if (validatePage(currentPage)) {
+      if (currentPage < 5) {
+        currentPage++;
+        emit(AiDescriptionPageChanged(currentPage));
+      }
+    } else {
+      emit(AiDescriptionValidationError("pleaseFillAllFields".tr()));
+    }
+  }
+
+  void previousPage() {
+    if (currentPage > 0) {
+      currentPage--;
+      emit(AiDescriptionPageChanged(currentPage));
+    }
+  }
+
+  File? programFile;
+  File? templateFile;
+
+  File? customDocxFile;
+  File? customPdfFile;
+  bool hasUnsavedCustomFiles = false;
+  bool get hasUploadedCustomFiles =>
+      customDocxFile != null && customPdfFile != null && !hasUnsavedCustomFiles;
+
+  String? pdfUrl;
+  String? docxUrl;
+  String? pdfName;
+  String? docxName;
+
+  String? aiPdfUrl;
+  String? aiDocxUrl;
+  String? aiPdfName;
+  String? aiDocxName;
+
+  void updateProgramFile(File file) {
+    programFile = file;
+    isUploaded = false;
+    emit(AiDescriptionFileUpdated());
+  }
+
+  void updateTemplateFile(File file) {
+    templateFile = file;
+    isUploaded = false;
+    emit(AiDescriptionFileUpdated());
+  }
+
+  int get countUploadedFileDone {
+    int count = 0;
+    if (programFile != null) count++;
+    if (templateFile != null) count++;
+    return count;
+  }
+
+  double get uploadProgress => countUploadedFileDone / 2;
+
+  // Step 1: Just Upload
+  Future<void> uploadAiFiles() async {
+    if (generationId == null) {
+      emit(AiDescriptionUploadError("pleaseClickStartFirst".tr()));
+      return;
+    }
+
+    if (programFile == null || templateFile == null) {
+      emit(AiDescriptionUploadError("pleaseSelectBothFiles".tr()));
+      return;
+    }
+
+    emit(AiDescriptionUploadLoading());
+    try {
+      await AiDescriptionService.uploadFiles(
+        generationId: generationId!,
+        programFile: programFile!,
+        templateFile: templateFile!,
+      );
+      isUploaded = true;
+      // New state to trigger the dialog in UI
+      emit(AiDescriptionUploadSuccess());
+    } catch (e) {
+      String msg = e.toString().replaceFirst('Exception: ', '').trim();
+      if (msg.isEmpty) msg = 'Upload Failed. Please try again.';
+      emit(AiDescriptionUploadError(msg));
+    }
+  }
+
+  // Step 2: Confirm (Called after user clicks YES in dialog)
+  Future<void> confirmAiFiles() async {
+    if (generationId == null) return;
+
+    emit(AiDescriptionConfirmLoading());
+    try {
+      await AiDescriptionService.confirmFiles(generationId: generationId!);
+      emit(AiDescriptionConfirmSuccess());
+    } catch (e) {
+      String msg = e.toString().replaceFirst('Exception: ', '').trim();
+      if (msg.isEmpty) msg = 'Confirmation Failed. Please try again.';
+      emit(AiDescriptionConfirmError(msg));
+    }
+  }
+
+  bool isCourseGenerated = false;
+  Future<void>? _generationFuture;
+  bool isGenerationCompleted = false;
+
+  Future<void> submitCourse() async {
+    if (generationId == null) return;
+    if (titleController.text.trim().isEmpty) {
+      emit(AiDescriptionSubmitError("pleaseEnterCourseName".tr()));
+      return;
+    }
+
+    emit(AiDescriptionSubmitLoading());
+    try {
+      await AiDescriptionService.submitCourse(
+        generationId: generationId!,
+        courseName: titleController.text.trim(),
+        courseSchedule: totalHoursController.text.trim(),
+      );
+
+      isCourseGenerated = true;
+      isGenerationCompleted = false;
+      _generationFuture = _pollGenerationStatus();
+
+      emit(AiDescriptionSubmitSuccess());
+    } catch (e) {
+      String msg = e.toString().replaceFirst('Exception: ', '').trim();
+      if (msg.isEmpty) msg = 'Submission Failed. Please try again.';
+      emit(AiDescriptionSubmitError(msg));
+    }
+  }
+
+  void goBackToSubmitStep() {
+    isCourseGenerated = false;
+    emit(AiDescriptionPageChanged(currentPage)); // Just to trigger a UI rebuild
+  }
+
+  Future<void> _pollGenerationStatus() async {
+    try {
+      bool isFinished = false;
+      while (!isFinished) {
+        final statusResult = await AiDescriptionService.checkGenerationStatus(
+          generationId: generationId!,
+        );
+        final status = statusResult.data?.status;
+
+        if (status == 'Generating') {
+          await Future.delayed(const Duration(seconds: 10));
+        } else if (status == 'Failed' || status == 'Error') {
+          throw Exception(statusResult.data?.error ?? 'Generation failed');
+        } else if (status == 'Complete') {
+          isFinished = true;
+        } else {
+          isFinished = true;
+        }
+      }
+      isGenerationCompleted = true;
+    } catch (e) {
+      isGenerationCompleted = false;
+    }
+  }
+
+  Future<void> startAiGeneration({required int courseId}) async {
+    emit(AiDescriptionStartLoading());
+    try {
+      final result = await AiDescriptionService.startGeneration(
+        courseId: courseId,
+      );
+      generationId = result.data?.id;
+      emit(AiDescriptionStartSuccess(generationId!));
+    } catch (e) {
+      emit(
+        AiDescriptionStartError(
+          e.toString().replaceFirst('Exception: ', '').trim(),
+        ),
+      );
+    }
+  }
+
+  Future<void> submitDetails() async {
+    if (generationId == null) return;
+
+    if (!validatePage(4)) {
+      emit(AiDescriptionSubmitDetailsError("pleaseFillAllFields".tr()));
+      return;
+    }
+
+    emit(AiDescriptionSubmitDetailsLoading());
+    try {
+      if (_generationFuture != null && !isGenerationCompleted) {
+        await _generationFuture;
+      }
+
+      if (!isGenerationCompleted && _generationFuture != null) {
+        emit(AiDescriptionSubmitDetailsError("generationFailed".tr()));
+        return;
+      }
+
+      final Map<String, dynamic> data = {
+        "basic_info": {
+          "course_title": titleController.text.trim(),
+          "course_code": codeController.text.trim(),
+          "department": deptController.text.trim(),
+          "course_type": typeController.text.trim(),
+          "academic_level": levelController.text.trim(),
+          "academic_program": programController.text.trim(),
+          "faculty": facultyController.text.trim(),
+          "university": uniController.text.trim(),
+          "coordinator": coordinatorController.text.trim(),
+          "approval_date": dateController.text.trim(),
+        },
+        "schedule_info": {
+          "total_weekly_hours":
+              int.tryParse(totalHoursController.text.trim()) ?? 0,
+        },
+        "learning_hours_weekly": weekControllers.asMap().entries.map((entry) {
+          int index = entry.key;
+          WeekControllers controllers = entry.value;
+          return {
+            "week": index + 1,
+            "theoretical":
+                int.tryParse(controllers.theoretical.text.trim()) ?? 0,
+            "training": int.tryParse(controllers.training.text.trim()) ?? 0,
+            "self_learning":
+                int.tryParse(controllers.selfLearning.text.trim()) ?? 0,
+            "other": int.tryParse(controllers.other.text.trim()) ?? 0,
+          };
+        }).toList(),
+        "resources": {
+          "main_reference": mainRefController.text.trim(),
+          "other_references": otherRefsController.text.trim(),
+          "electronic_sources": electronicController.text.trim(),
+          "learning_platforms": platformsController.text.trim(),
+          "other": otherResController.text.trim(),
+        },
+        "facilities": {
+          "devices": devicesController.text.trim(),
+          "supplies": suppliesController.text.trim(),
+          "programs": softwareController.text.trim(),
+          "skill_labs": labsController.text.trim(),
+          "virtual_labs": virtualLabsController.text.trim(),
+          "other": otherFacController.text.trim(),
+        },
+      };
+
+      final result = await AiDescriptionService.submitDetails(
+        generationId: generationId!,
+        data: data,
+      );
+      if (result.isSuccess) {
+        // Move to the download step
+        currentPage = 5;
+        emit(AiDescriptionSubmitDetailsSuccess());
+        emit(AiDescriptionPageChanged(currentPage));
+
+        // Fetch URLs for the download step
+        getGeneratedFileUrls();
+      } else {
+        emit(
+          AiDescriptionSubmitDetailsError(
+            result.error?.description ?? "Submission failed",
+          ),
+        );
+      }
+    } catch (e) {
+      emit(
+        AiDescriptionSubmitDetailsError(
+          e.toString().replaceFirst('Exception: ', '').trim(),
+        ),
+      );
+    }
+  }
+
+  bool validatePage(int page) {
+    switch (page) {
+      case 0:
+        return titleController.text.trim().isNotEmpty &&
+            codeController.text.trim().isNotEmpty &&
+            deptController.text.trim().isNotEmpty &&
+            typeController.text.trim().isNotEmpty &&
+            levelController.text.trim().isNotEmpty &&
+            programController.text.trim().isNotEmpty &&
+            facultyController.text.trim().isNotEmpty &&
+            uniController.text.trim().isNotEmpty &&
+            coordinatorController.text.trim().isNotEmpty &&
+            dateController.text.trim().isNotEmpty;
+      case 1:
+        return totalHoursController.text.trim().isNotEmpty;
+      case 2:
+        for (var controller in weekControllers) {
+          if (controller.theoretical.text.trim().isEmpty ||
+              controller.training.text.trim().isEmpty ||
+              controller.selfLearning.text.trim().isEmpty) {
+            return false;
+          }
+        }
+        return true;
+      case 3:
+        return mainRefController.text.trim().isNotEmpty &&
+            otherRefsController.text.trim().isNotEmpty &&
+            electronicController.text.trim().isNotEmpty &&
+            platformsController.text.trim().isNotEmpty;
+      case 4:
+        return devicesController.text.trim().isNotEmpty &&
+            suppliesController.text.trim().isNotEmpty &&
+            softwareController.text.trim().isNotEmpty &&
+            labsController.text.trim().isNotEmpty &&
+            virtualLabsController.text.trim().isNotEmpty;
+      default:
+        return true;
+    }
+  }
+
+  Future<void> getGeneratedFileUrls() async {
+    if (generationId == null) return;
+    try {
+      if (_generationFuture != null && !isGenerationCompleted) {
+        await _generationFuture;
+      }
+      // The backend now directly returns the file on download.
+      // We just construct the URLs to be used.
+      docxUrl = EndPoints.downloadFiles(generationId!, 0);
+      pdfUrl = EndPoints.downloadFiles(generationId!, 1);
+
+      if (aiDocxUrl == null) {
+        aiDocxUrl = docxUrl;
+        aiDocxName = "Course_Description.docx";
+      }
+      if (aiPdfUrl == null) {
+        aiPdfUrl = pdfUrl;
+        aiPdfName = "Course_Description.pdf";
+      }
+      emit(AiDescriptionFileUpdated());
+    } catch (e) {
+      // Handle error
+    }
+  }
+
+  void revertToAiFiles() {
+    customDocxFile = null;
+    customPdfFile = null;
+    docxUrl = aiDocxUrl;
+    docxName = aiDocxName;
+    pdfUrl = aiPdfUrl;
+    pdfName = aiPdfName;
+    hasUnsavedCustomFiles = false;
+    emit(AiDescriptionFileUpdated());
+  }
+
+  void selectCustomFiles({required File docx, required File pdf}) {
+    customDocxFile = docx;
+    customPdfFile = pdf;
+    hasUnsavedCustomFiles = true;
+    emit(AiDescriptionFileUpdated());
+  }
+
+  Future<void> downloadFile(int fileType) async {
+    // This method is no longer used by UI, UI handles download directly.
+    if (generationId == null) return;
+    emit(AiDescriptionDownloadLoading());
+    try {
+      final url = EndPoints.downloadFiles(generationId!, fileType);
+      emit(AiDescriptionDownloadSuccess(url));
+    } catch (e) {
+      emit(AiDescriptionDownloadError(e.toString()));
+    }
+  }
+
+  Future<void> uploadCustomFile({required File docx, required File pdf}) async {
+    if (generationId == null) return;
+    customDocxFile = docx;
+    customPdfFile = pdf;
+    emit(AiDescriptionFileUpdated());
+    emit(AiDescriptionCustomUploadLoading());
+    try {
+      final result = await AiDescriptionService.uploadCustomDescription(
+        generationId: generationId!,
+        docxFile: docx,
+        pdfFile: pdf,
+      );
+      if (result.isSuccess) {
+        hasUnsavedCustomFiles = false;
+        emit(AiDescriptionCustomUploadSuccess());
+        // After successful upload, refresh URLs
+        getGeneratedFileUrls();
+      } else {
+        emit(AiDescriptionCustomUploadError("Upload failed"));
+      }
+    } catch (e) {
+      emit(AiDescriptionCustomUploadError(e.toString()));
+    }
+  }
+
+  Future<void> confirmFinal() async {
+    if (generationId == null || docxUrl == null || pdfUrl == null) {
+      emit(AiDescriptionFinalConfirmError("Please ensure files are ready"));
+      return;
+    }
+    emit(AiDescriptionFinalConfirmLoading());
+    try {
+      final result = await AiDescriptionService.confirmGeneration(
+        generationId: generationId!,
+      );
+      if (result.isSuccess) {
+        try {
+          await AiDescriptionService.endGeneration(generationId: generationId!);
+        } catch (e) {
+          // Log or handle end session error gracefully so as not to block confirm success
+        }
+        emit(
+          AiDescriptionFinalConfirmSuccess(
+            result.data ?? "Description stored successfully",
+          ),
+        );
+      } else {
+        emit(AiDescriptionFinalConfirmError("Confirmation failed"));
+      }
+    } catch (e) {
+      emit(AiDescriptionFinalConfirmError(e.toString()));
+    }
+  }
+
+  Future<void> endGeneration() async {
+    if (generationId == null) return;
+    try {
+      await AiDescriptionService.endGeneration(generationId: generationId!);
+    } catch (e) {
+      // Ignore error for end generation
+    } finally {
+      generationId = null;
+      isUploaded = false;
+      programFile = null;
+      templateFile = null;
+      _generationFuture = null;
+      isGenerationCompleted = false;
+      isCourseGenerated = false;
+      emit(AiDescriptionInitial());
+    }
+  }
+
+  Future<void> getFileTypes() async {
+    emit(AiDescriptionFileTypesLoading());
+    try {
+      final types = await AiDescriptionService.getCourseFileTypes();
+      emit(AiDescriptionFileTypesSuccess(types));
+    } catch (e) {
+      emit(AiDescriptionFileTypesError(e.toString()));
+    }
+  }
+
+  void reset() {
+    generationId = null;
+    isUploaded = false;
+    currentPage = 0;
+    learningWeeksCount = 15;
+    _generationFuture = null;
+    isGenerationCompleted = false;
+    hasUnsavedCustomFiles = false;
+
+    programFile = null;
+    templateFile = null;
+    customDocxFile = null;
+    customPdfFile = null;
+
+    pdfUrl = null;
+    docxUrl = null;
+    pdfName = null;
+    docxName = null;
+    aiPdfUrl = null;
+    aiDocxUrl = null;
+    aiPdfName = null;
+    aiDocxName = null;
+
+    isCourseGenerated = false;
+
+    titleController.clear();
+    codeController.clear();
+    deptController.clear();
+    typeController.clear();
+    levelController.clear();
+    programController.clear();
+    facultyController.clear();
+    uniController.clear();
+    coordinatorController.clear();
+    dateController.clear();
+
+    mainRefController.clear();
+    otherRefsController.clear();
+    electronicController.clear();
+    platformsController.clear();
+    otherResController.clear();
+
+    devicesController.clear();
+    suppliesController.clear();
+    softwareController.clear();
+    labsController.clear();
+    virtualLabsController.clear();
+    otherFacController.clear();
+
+    totalHoursController.text = "3";
+    descriptionController.clear();
+
+    for (var controller in weekControllers) {
+      controller.dispose();
+    }
+    weekControllers = [];
+    for (int i = 0; i < learningWeeksCount; i++) {
+      weekControllers.add(WeekControllers());
+    }
+
+    emit(AiDescriptionInitial());
+  }
+
+  @override
+  Future<void> close() {
+    titleController.dispose();
+    codeController.dispose();
+    deptController.dispose();
+    typeController.dispose();
+    levelController.dispose();
+    programController.dispose();
+    facultyController.dispose();
+    uniController.dispose();
+    coordinatorController.dispose();
+    dateController.dispose();
+
+    mainRefController.dispose();
+    otherRefsController.dispose();
+    electronicController.dispose();
+    platformsController.dispose();
+    otherResController.dispose();
+
+    devicesController.dispose();
+    suppliesController.dispose();
+    softwareController.dispose();
+    labsController.dispose();
+    virtualLabsController.dispose();
+    otherFacController.dispose();
+
+    totalHoursController.dispose();
+    for (var controller in weekControllers) {
+      controller.dispose();
+    }
+    return super.close();
+  }
+}

@@ -1,0 +1,13 @@
+import 'package:dio/dio.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+
+class LanguageInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    if (!options.headers.containsKey('Accept-Language')) {
+      final lang = CashHelper.getData(key: KeysTexts.lang) ?? 'en';
+      options.headers['Accept-Language'] = lang;
+    }
+    handler.next(options);
+  }
+}

@@ -1,0 +1,418 @@
+import 'package:go_router/go_router.dart';
+import 'package:qualiverse_system/features/ai_report/presentation/view/ai_report_job_status_screen.dart';
+import 'package:qualiverse_system/features/ai_report/presentation/view/ai_report_history_screen.dart';
+
+import 'all_routes_imports.dart';
+
+class ScreensRoutes {
+  static GoRoute aiDescriptionRoute() {
+    return GoRoute(
+      path: AppRoutes.aiDescriptionScreen,
+      name: AppRoutes.aiDescriptionScreen,
+      pageBuilder: (context, state) {
+        final courseId = state.extra as int;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: AiDescriptionScreen(courseId: courseId),
+        );
+      },
+    );
+  }
+
+  static GoRoute aiCourseSelectionRoute() {
+    return GoRoute(
+      path: AppRoutes.aiCourseSelectionScreen,
+      name: AppRoutes.aiCourseSelectionScreen,
+      pageBuilder: (context, state) {
+        final Map<String, dynamic> extra = state.extra as Map<String, dynamic>;
+        final nextRoute = extra["nextRoute"] as String;
+        final title = extra["title"] as String;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: AiCourseSelectionScreen(nextRoute: nextRoute, title: title),
+        );
+      },
+    );
+  }
+
+  static GoRoute aiDescriptionResultRoute() {
+    return GoRoute(
+      path: AppRoutes.aiDescriptionResultScreen,
+      name: AppRoutes.aiDescriptionResultScreen,
+      pageBuilder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>?;
+        final title = extra?["title"] as String? ?? "";
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: AiDescriptionResultScreen(title: title),
+        );
+      },
+    );
+  }
+
+  static GoRoute accountVerificationRoute() {
+    return GoRoute(
+      path: AppRoutes.accountVerificationScreen,
+      name: AppRoutes.accountVerificationScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const AccountVerificationScreen(),
+      ),
+    );
+  }
+
+  static GoRoute forgetPasswordRoute() {
+    return GoRoute(
+      path: AppRoutes.resetPasswordScreen,
+      name: AppRoutes.resetPasswordScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const ResetPasswordScreen(),
+      ),
+    );
+  }
+
+  static GoRoute onboardingRoute() {
+    return GoRoute(
+      path: AppRoutes.onboardingScreen,
+      name: AppRoutes.onboardingScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const OnboardingScreen(),
+      ),
+    );
+  }
+
+  static GoRoute aiReportRoute() {
+    return GoRoute(
+      path: AppRoutes.aiReportScreen,
+      name: AppRoutes.aiReportScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const AiReportScreen(),
+      ),
+    );
+  }
+
+  static GoRoute aiReportStatusRoute() {
+    return GoRoute(
+      path: AppRoutes.aiReportStatusScreen,
+      name: AppRoutes.aiReportStatusScreen,
+      pageBuilder: (context, state) {
+        final courseId = state.extra as int;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: AiReportStatusScreen(courseId: courseId),
+        );
+      },
+    );
+  }
+
+  static GoRoute aiReportResultRoute() {
+    return GoRoute(
+      path: AppRoutes.aiReportResultScreen,
+      name: AppRoutes.aiReportResultScreen,
+      pageBuilder: (context, state) {
+        final AiReportExtractResponse? extractResponse =
+            state.extra as AiReportExtractResponse?;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: AiReportResultScreen(extractResponse: extractResponse),
+        );
+      },
+    );
+  }
+
+  static GoRoute aiMainRoute() {
+    return GoRoute(
+      path: AppRoutes.aiMainScreen,
+      name: AppRoutes.aiMainScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const AiMainScreen(),
+      ),
+    );
+  }
+
+  static GoRoute coursesMainRoute() {
+    return GoRoute(
+      path: AppRoutes.coursesMainScreen,
+      name: AppRoutes.coursesMainScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const CoursesMainScreen(),
+      ),
+    );
+  }
+
+  static GoRoute institutionalAccreditationRoute() {
+    return GoRoute(
+      path: AppRoutes.institutionalAccreditationScreen,
+      name: AppRoutes.institutionalAccreditationScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const InstitutionalAccreditationScreen(),
+        type: PageTransitionType.slideSoft,
+      ),
+    );
+  }
+
+  static GoRoute programAccreditationRoute() {
+    return GoRoute(
+      path: AppRoutes.programAccreditationScreen,
+      name: AppRoutes.programAccreditationScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const ProgramAccreditationScreen(),
+        type: PageTransitionType.slideSoft,
+      ),
+    );
+  }
+
+  static GoRoute departmentRoute() {
+    return GoRoute(
+      path: AppRoutes.departmentScreen,
+      name: AppRoutes.departmentScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const DepartmentScreen(),
+        // type: PageTransitionType.fadeSlide,
+      ),
+    );
+  }
+
+  static GoRoute accreditationRoute() {
+    return GoRoute(
+      name: AppRoutes.accreditationScreen,
+      path: AppRoutes.accreditationScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const AccreditationScreen(),
+        type: PageTransitionType.slideSoft,
+      ),
+    );
+  }
+
+  static GoRoute homeRoute() {
+    return GoRoute(
+      name: AppRoutes.homeScreen,
+      path: AppRoutes.homeScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const HomeScreen(),
+        // type: PageTransitionType.slideBottom,
+      ),
+    );
+  }
+
+  static GoRoute settingRoute() {
+    return GoRoute(
+      name: AppRoutes.settingScreen,
+      path: AppRoutes.settingScreen,
+      builder: (context, state) => const SettingScreen(),
+    );
+  }
+
+  static GoRoute loginRoute() {
+    return GoRoute(
+      name: AppRoutes.loginScreen,
+      path: AppRoutes.loginScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const LoginScreen(),
+      ),
+    );
+  }
+
+  static GoRoute signUpRoute() {
+    return GoRoute(
+      name: AppRoutes.signUpScreen,
+      path: AppRoutes.signUpScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const SignUpScreen(),
+        // type: PageTransitionType.fade,
+      ),
+    );
+  }
+
+  static GoRoute coursesFirstAndSecondTermRoute() {
+    return GoRoute(
+      path: AppRoutes.coursesFirstAndSecondTermScreen,
+      name: AppRoutes.coursesFirstAndSecondTermScreen,
+      pageBuilder: (context, state) {
+        final args = state.extra as CourseArgs;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: CoursesFirstAndSecondTermScreen(courseArgs: args),
+        );
+      },
+    );
+  }
+
+  static GoRoute rapporteurReportSecondTermRoute() {
+    return GoRoute(
+      path: AppRoutes.rapporteurReportSecondTermScreen,
+      name: AppRoutes.rapporteurReportSecondTermScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const RapporteurReportSecondTermScreen(),
+      ),
+    );
+  }
+
+  static GoRoute rapporteurReportFirstTermRoute() {
+    return GoRoute(
+      path: AppRoutes.rapporteurReportFirstTermScreen,
+      name: AppRoutes.rapporteurReportFirstTermScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const RapporteurReportFirstTermScreen(),
+      ),
+    );
+  }
+
+  static GoRoute courseSpecificationSecondTermRoute() {
+    return GoRoute(
+      path: AppRoutes.courseSpecificationSecondTermScreen,
+      name: AppRoutes.courseSpecificationSecondTermScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const CourseSpecificationSecondTermScreen(),
+      ),
+    );
+  }
+
+  static GoRoute courseSpecificationFirstTermRoute() {
+    return GoRoute(
+      path: AppRoutes.courseSpecificationFirstTermScreen,
+      name: AppRoutes.courseSpecificationFirstTermScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const CourseSpecificationFirstTermScreen(),
+      ),
+    );
+  }
+
+  static GoRoute dashboardRoute() {
+    return GoRoute(
+      path: AppRoutes.dashboardScreen,
+      name: AppRoutes.dashboardScreen,
+      builder: (context, state) => const DashboardScreen(),
+    );
+  }
+
+  static GoRoute adminDashboardRoute() {
+    return GoRoute(
+      path: AppRoutes.adminDashboardScreen,
+      name: AppRoutes.adminDashboardScreen,
+      builder: (context, state) => const AdminDashboardScreen(),
+    );
+  }
+
+  static GoRoute splashRoute() {
+    return GoRoute(
+      path: AppRoutes.splashScreen,
+      name: AppRoutes.splashScreen,
+      builder: (context, state) => const SplashScreen(),
+    );
+  }
+
+  static GoRoute indicatorRoute() {
+    return GoRoute(
+      path: AppRoutes.indicatorsScreen,
+      name: AppRoutes.indicatorsScreen,
+      pageBuilder: (context, state) {
+        final args = state.extra as IndicatorsArgs;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: IndicatorsScreen(indicatorsArgs: args),
+        );
+      },
+    );
+  }
+
+  static GoRoute editFilesRoute() {
+    return GoRoute(
+      path: AppRoutes.editFilesScreen,
+      name: AppRoutes.editFilesScreen,
+      pageBuilder: (context, state) {
+        final args = state.extra as CourseFolderArgs;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: EditFilesScreen(courseFolderArgs: args),
+        );
+      },
+    );
+  }
+
+  static GoRoute evidenceFolderFilesRoute() {
+    return GoRoute(
+      path: AppRoutes.evidenceFolderFilesScreen,
+      name: AppRoutes.evidenceFolderFilesScreen,
+      pageBuilder: (context, state) {
+        final Map<String, dynamic> args = state.extra as Map<String, dynamic>;
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: EvidenceFolderFilesScreen(
+            folderName: args['folderName'],
+            folderId: args['folderId'],
+          ),
+        );
+      },
+    );
+  }
+
+  static GoRoute aiReportJobStatusRoute() {
+    return GoRoute(
+      path: AppRoutes.aiReportJobStatusScreen,
+      name: AppRoutes.aiReportJobStatusScreen,
+      pageBuilder: (context, state) {
+        final String jobId = state.extra as String? ?? '';
+        return buildPageWithTransition(
+          context: context,
+          state: state,
+          child: AiReportJobStatusScreen(jobId: jobId),
+        );
+      },
+    );
+  }
+
+  static GoRoute aiReportHistoryRoute() {
+    return GoRoute(
+      path: AppRoutes.aiReportHistoryScreen,
+      name: AppRoutes.aiReportHistoryScreen,
+      pageBuilder: (context, state) => buildPageWithTransition(
+        context: context,
+        state: state,
+        child: const AiReportHistoryScreen(),
+      ),
+    );
+  }
+}

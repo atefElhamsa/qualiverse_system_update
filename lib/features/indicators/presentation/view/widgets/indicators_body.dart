@@ -1,0 +1,66 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
+import 'package:qualiverse_system/features/all_features_imports/all_features_imports.dart';
+import 'indicators_shimmer.dart';
+
+class IndicatorsBody extends StatelessWidget {
+  const IndicatorsBody({super.key, required this.indicatorsArgs});
+
+  final IndicatorsArgs indicatorsArgs;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScaffold(
+      onRefresh: () => context.read<IndicatorsCubit>().fetchIndicators(
+        criterionId: indicatorsArgs.accreditationModel.id,
+      ),
+      widget: Column(
+        children: [
+          IndicatorsTopAndTitle(title: indicatorsArgs.title),
+          BlocBuilder<IndicatorsCubit, IndicatorsState>(
+            buildWhen: (previous, current) =>
+                current is IndicatorsSuccess ||
+                current is IndicatorsError ||
+                current is IndicatorsLoading,
+            builder: (context, state) {
+              if (state is IndicatorsLoading) {
+                return const IndicatorsShimmer();
+              }
+              if (state is IndicatorsError) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 100.h),
+                  child: RetryWidget(
+                    title: state.message,
+                    onPressed: () {
+                      context.read<IndicatorsCubit>().fetchIndicators(
+                        criterionId: indicatorsArgs.accreditationModel.id,
+                      );
+                    },
+                  ),
+                );
+              }
+              if (state is IndicatorsSuccess) {
+                final indicators = state.indicators;
+                return Column(
+                  children: [
+                    MiddleContent(
+                      indicatorsArgs: indicatorsArgs,
+                      indicators: indicators,
+                    ),
+                    TableWithLine(
+                      indicatorsArgs: indicatorsArgs,
+                      indicators: indicators,
+                    ),
+                  ],
+                );
+              }
+              return const SizedBox();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}

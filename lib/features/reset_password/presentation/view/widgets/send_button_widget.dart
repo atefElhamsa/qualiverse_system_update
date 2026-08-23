@@ -1,0 +1,52 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
+import 'package:qualiverse_system/features/all_features_imports/all_features_imports.dart';
+
+class SendButtonWidget extends StatelessWidget {
+  const SendButtonWidget({
+    super.key,
+    required this.resetPasswordCubit,
+    required this.resetPasswordState,
+  });
+
+  final ResetPasswordCubit resetPasswordCubit;
+  final ResetPasswordState resetPasswordState;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: resetPasswordState is ResetPasswordOtpLoading
+          ? AlignmentDirectional.center
+          : AlignmentDirectional.centerEnd,
+      child: Padding(
+        padding: EdgeInsetsDirectional.only(end: 110.w),
+        child: resetPasswordState is ResetPasswordOtpLoading
+            ? const CustomLoading()
+            : SizedBox(
+                width: 154.w,
+                height: 56.h,
+                child: CustomButton(
+                  buttonModel: ButtonModel(
+                    onPressed: () {
+                      resetPasswordCubit.resetPasswordCubit();
+                    },
+                    backgroundColor: AppColors.loginButtonColor,
+                    radius: 25,
+                    customText: CustomText(
+                      title: "send".tr(),
+                      textStyle: GoogleFonts.inter(
+                        fontSize: 13.sp,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+}

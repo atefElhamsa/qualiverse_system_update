@@ -1,0 +1,17 @@
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+
+abstract class AssignmentStatusState {}
+
+class AssignmentStatusInitial extends AssignmentStatusState {}
+
+class AssignmentStatusLoading extends AssignmentStatusState {}
+
+class AssignmentStatusSuccess extends AssignmentStatusState {
+  final List<AssignmentStateModel> statuses;
+  AssignmentStatusSuccess({required this.statuses});
+}
+
+class AssignmentStatusError extends AssignmentStatusState {
+  final String error;
+  AssignmentStatusError({required this.error});
+}

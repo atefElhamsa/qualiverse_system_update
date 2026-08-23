@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import 'all_routes_imports.dart';
+
+class RouterGenerator {
+  static GlobalKey<NavigatorState> rootNavigatorKey =
+      GlobalKey<NavigatorState>();
+
+  static GoRouter mainRoutingInOurApp = GoRouter(
+    errorBuilder: (context, state) => const NotFoundPage(),
+    initialLocation: AppRoutes.splashScreen,
+    debugLogDiagnostics: true,
+    navigatorKey: rootNavigatorKey,
+    routes: [
+      ScreensRoutes.onboardingRoute(),
+      ScreensRoutes.accountVerificationRoute(),
+      ScreensRoutes.forgetPasswordRoute(),
+      ScreensRoutes.loginRoute(),
+      ScreensRoutes.signUpRoute(),
+      ScreensRoutes.settingRoute(),
+      ScreensRoutes.homeRoute(),
+      ScreensRoutes.accreditationRoute(),
+      ScreensRoutes.departmentRoute(),
+      ScreensRoutes.programAccreditationRoute(),
+      ScreensRoutes.institutionalAccreditationRoute(),
+      ScreensRoutes.coursesMainRoute(),
+      ScreensRoutes.aiMainRoute(),
+      ScreensRoutes.aiReportRoute(),
+      ScreensRoutes.aiReportStatusRoute(),
+      ScreensRoutes.aiReportResultRoute(),
+      ScreensRoutes.aiReportJobStatusRoute(),
+      ScreensRoutes.aiDescriptionRoute(),
+      ScreensRoutes.aiCourseSelectionRoute(),
+      ScreensRoutes.aiDescriptionResultRoute(),
+      ScreensRoutes.coursesFirstAndSecondTermRoute(),
+      ScreensRoutes.editFilesRoute(),
+      ScreensRoutes.indicatorRoute(),
+      ScreensRoutes.splashRoute(),
+      ScreensRoutes.dashboardRoute(),
+      ScreensRoutes.courseSpecificationFirstTermRoute(),
+      ScreensRoutes.courseSpecificationSecondTermRoute(),
+      ScreensRoutes.rapporteurReportFirstTermRoute(),
+      ScreensRoutes.rapporteurReportSecondTermRoute(),
+      ScreensRoutes.adminDashboardRoute(),
+      ScreensRoutes.evidenceFolderFilesRoute(),
+      ScreensRoutes.aiReportHistoryRoute(),
+    ],
+  );
+}

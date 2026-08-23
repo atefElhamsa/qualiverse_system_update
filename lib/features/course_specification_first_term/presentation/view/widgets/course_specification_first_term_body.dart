@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
+import 'package:qualiverse_system/features/all_features_imports/all_features_imports.dart';
+import 'package:qualiverse_system/routing/app_routes.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+class CourseSpecificationFirstTermBody extends StatelessWidget {
+  const CourseSpecificationFirstTermBody({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScaffold(
+      widget: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CourseSpecificationTop(),
+          const SizedBox(height: 22),
+          const CoursesList(),
+          Padding(
+            padding: EdgeInsets.only(top: 50.h, bottom: 10.w),
+            child: FirstAndSecondTermButton(
+              mainAxisAlignment: MainAxisAlignment.end,
+              title: "secondterm".tr(),
+              onPressed: () {
+                context.pushNamed(
+                  AppRoutes.courseSpecificationSecondTermScreen,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

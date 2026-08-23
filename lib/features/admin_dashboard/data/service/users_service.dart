@@ -1,0 +1,126 @@
+import 'package:dio/dio.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+
+class UsersService {
+  static final Dio dio = ApiClient.dio;
+
+  static Future<UserManagementResponseModel> getUsers({
+    List<String>? roles,
+  }) async {
+    try {
+      final response = await dio.get(
+        EndPoints.user,
+        queryParameters: {
+          if (roles != null && roles.isNotEmpty) 'roles': roles,
+        },
+      );
+      final Map<String, dynamic> body = response.data;
+      final result = UserManagementResponseModel.fromJson(body);
+      if (!result.isSuccess) {
+        throw Exception(result.error?.description ?? "Failed to load users");
+      }
+      return result;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('Unauthorized');
+      }
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        throw Exception('No Internet Connection');
+      }
+
+      throw Exception(
+        e.response?.data?['error']?['description'] ??
+            e.response?.data?['message'] ??
+            'Server Error',
+      );
+    } catch (e) {
+      throw Exception(e.toString().replaceFirst('Exception: ', '').trim());
+    }
+  }
+
+  static Future<String> activateUser({required String id}) async {
+    try {
+      final response = await dio.patch(EndPoints.activateUser(id: id));
+      final Map<String, dynamic> body = response.data;
+      if (body['isSuccess'] != true) {
+        throw Exception('Failed to activate user');
+      }
+      return body['data'];
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('Unauthorized');
+      }
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        throw Exception('No Internet Connection');
+      }
+
+      throw Exception(
+        e.response?.data?['error']?['description'] ??
+            e.response?.data?['message'] ??
+            'Server Error',
+      );
+    } catch (e) {
+      throw Exception(e.toString().replaceFirst('Exception: ', '').trim());
+    }
+  }
+
+  static Future<String> deactivateUser({required String id}) async {
+    try {
+      final response = await dio.patch(EndPoints.deactivateUser(id: id));
+      final Map<String, dynamic> body = response.data;
+      if (body['isSuccess'] != true) {
+        throw Exception('Failed to deactivate user');
+      }
+      return body['data'];
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('Unauthorized');
+      }
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        throw Exception('No Internet Connection');
+      }
+
+      throw Exception(
+        e.response?.data?['error']?['description'] ??
+            e.response?.data?['message'] ??
+            'Server Error',
+      );
+    } catch (e) {
+      throw Exception(e.toString().replaceFirst('Exception: ', '').trim());
+    }
+  }
+
+  static Future<String> deleteUser({required String id}) async {
+    try {
+      final response = await dio.delete(EndPoints.deleteUser(id: id));
+      final Map<String, dynamic> body = response.data;
+      if (body['isSuccess'] != true) {
+        throw Exception('Failed to delete user');
+      }
+      return body['data'];
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('Unauthorized');
+      }
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        throw Exception('No Internet Connection');
+      }
+
+      throw Exception(
+        e.response?.data?['error']?['description'] ??
+            e.response?.data?['message'] ??
+            'Server Error',
+      );
+    } catch (e) {
+      throw Exception(e.toString().replaceFirst('Exception: ', '').trim());
+    }
+  }
+}

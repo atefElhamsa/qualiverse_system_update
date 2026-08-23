@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../../routing/all_routes_imports.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'program_accreditation_shimmer.dart';
+
+class GridViewProgramItemsWidget extends StatelessWidget {
+  const GridViewProgramItemsWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProgramAccreditationCubit, ProgramAccreditationState>(
+      builder: (context, state) {
+        if (state is ProgramAccreditationLoading) {
+          return const ProgramAccreditationShimmer();
+        }
+        if (state is ProgramAccreditationError) {
+          return RetryWidget(
+            title: state.message,
+            onPressed: () {
+              final meState = context.read<MeCubit>().state;
+              final isAdmin =
+                  meState is MeSuccess &&
+                  meState.meModel.role.toLowerCase() == 'admin';
+              context
+                  .read<ProgramAccreditationCubit>()
+                  .fetchProgramAccreditations(
+                    academicYearId: AcademicYearCubit.get(
+                      context,
+                    ).selectedAcademicYear!.id,
+                    departmentId: DepartmentCubit.get(
+                      context,
+                    ).selectedDepartment?.id,
+                    isAdmin: isAdmin,
+                  );
+            },
+          );
+        }
+        if (state is ProgramAccreditationSuccess) {
+          final accreditations = state.accreditations;
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 30,
+              childAspectRatio: 4,
+            ),
+            itemBuilder: (context, index) {
+              return ItemWidget(
+                itemModel: programItems[index % programItems.length],
+                accreditationModel: accreditations[index],
+                onTap: () {
+                  context
+                      .read<ProgramAccreditationCubit>()
+                      .selectProgramAccreditation(
+                        accreditation: accreditations[index],
+                      );
+                  context.pushNamed(
+                    AppRoutes.indicatorsScreen,
+                    extra: IndicatorsArgs(
+                      accreditationModel: accreditations[index],
+                      title: "programIndicators".tr(),
+                      index: index,
+                    ),
+                  );
+                },
+              );
+            },
+            itemCount: accreditations.length,
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
+}

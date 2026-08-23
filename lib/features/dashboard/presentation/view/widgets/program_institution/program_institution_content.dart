@@ -1,0 +1,34 @@
+import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
+import 'evidence_chart_page_program.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+
+class ProgramInstitutionContent extends StatelessWidget {
+  const ProgramInstitutionContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CustomText(
+              title: "programVsInstitution".tr(),
+              textStyle: GoogleFonts.inter(
+                fontSize: 32.sp,
+                fontWeight: FontWeight.w800,
+                color: AppColors.mainBlack,
+              ),
+            ),
+            const EvidenceChartPageProgram(),
+          ],
+        ),
+      ),
+    );
+  }
+}

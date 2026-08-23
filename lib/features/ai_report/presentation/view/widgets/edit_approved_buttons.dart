@@ -1,0 +1,67 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
+
+class EditApprovedButtons extends StatelessWidget {
+  final VoidCallback? onApprovedPressed;
+  final String? title;
+  final IconData? icon;
+  const EditApprovedButtons({
+    super.key,
+    this.onApprovedPressed,
+    this.title,
+    this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap:
+                onApprovedPressed ??
+                () => context.push(AppRoutes.aiReportResultScreen),
+            child: Container(
+              height: 50.h,
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              decoration: BoxDecoration(
+                color: AppColors.colorButtonLight,
+                borderRadius: BorderRadius.circular(32.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.colorButtonLight.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, color: AppColors.white, size: 20.sp),
+                    SizedBox(width: 8.w),
+                  ],
+                  Text(
+                    title ?? "approved".tr(),
+                    style: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                      color: AppColors.white,
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

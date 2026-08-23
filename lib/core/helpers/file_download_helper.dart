@@ -1,0 +1,130 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:qualiverse_system/core/network/api_client.dart';
+import 'package:qualiverse_system/core/utils/end_points.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
+
+class FileDownloadHelper {
+  static final Dio _dio = ApiClient.dio;
+
+  static Future<String?> downloadAndOpen({
+    required String filePath,
+    required String fileName,
+    void Function(int received, int total)? onProgress,
+  }) async {
+    try {
+      // Check network connectivity first
+      final List<ConnectivityResult> connectivityResult = await (Connectivity()
+          .checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        return 'النت قطع، يرجى التحقق من اتصالك بالإنترنت';
+      }
+
+      // Build full URL
+      final url = filePath.startsWith('http')
+          ? filePath
+          : '${EndPoints.baseUrlToOpenFile}/${filePath.startsWith('/') ? filePath.substring(1) : filePath}';
+
+      // Get file extension
+      final ext = fileName.contains('.') ? fileName.split('.').last : null;
+
+      // Let user choose save location
+      final savePath = await FilePicker.platform.saveFile(
+        dialogTitle: 'اختر مكان حفظ الملف',
+        fileName: fileName,
+        allowedExtensions: ext != null ? [ext] : null,
+        type: ext != null ? FileType.custom : FileType.any,
+      );
+
+      // User cancelled
+      if (savePath == null) return null;
+
+      // Download the file to the chosen path
+      await _dio.download(
+        url,
+        savePath,
+        onReceiveProgress: onProgress,
+        deleteOnError: true,
+        options: Options(
+          responseType: ResponseType.bytes,
+          receiveTimeout: const Duration(seconds: 30),
+          headers: {'Accept': '*/*'},
+        ),
+      );
+
+      // Open the saved file
+      if (Platform.isWindows) {
+        await Process.run('explorer', [savePath]);
+      }
+
+      return null;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return 'انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى';
+      }
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        return 'النت قطع، يرجى التحقق من اتصالك بالإنترنت';
+      }
+      return 'فشل التحميل: ${e.message}';
+    } catch (e) {
+      return e.toString().replaceFirst('Exception: ', '').trim();
+    }
+  }
+
+  static Future<String?> viewFileDirectly({
+    required String filePath,
+    required String fileName,
+    void Function(int received, int total)? onProgress,
+  }) async {
+    try {
+      final List<ConnectivityResult> connectivityResult = await (Connectivity()
+          .checkConnectivity());
+      if (connectivityResult.contains(ConnectivityResult.none)) {
+        return 'النت قطع، يرجى التحقق من اتصالك بالإنترنت';
+      }
+
+      final url = filePath.startsWith('http')
+          ? filePath
+          : '${EndPoints.baseUrlToOpenFile}/${filePath.startsWith('/') ? filePath.substring(1) : filePath}';
+
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = '${tempDir.path}/$fileName';
+
+      await _dio.download(
+        url,
+        tempPath,
+        onReceiveProgress: onProgress,
+        deleteOnError: true,
+        options: Options(
+          responseType: ResponseType.bytes,
+          receiveTimeout: const Duration(seconds: 30),
+          headers: {'Accept': '*/*'},
+        ),
+      );
+
+      if (Platform.isWindows) {
+        await Process.run('explorer', [tempPath]);
+      } else {
+        await OpenFilex.open(tempPath);
+      }
+      return null;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return 'انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى';
+      }
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        return 'النت قطع، يرجى التحقق من اتصالك بالإنترنت';
+      }
+      return 'فشل فتح الملف: ${e.message}';
+    } catch (e) {
+      return e.toString().replaceFirst('Exception: ', '').trim();
+    }
+  }
+}

@@ -1,0 +1,66 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:qualiverse_system/core/shared_widgets/custom_shimmer.dart';
+import '../../../../../routing/all_routes_imports.dart';
+
+class SelectYear extends StatelessWidget {
+  const SelectYear({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AcademicYearCubit, AcademicYearState>(
+      builder: (context, state) {
+        if (state is AcademicYearLoading) {
+          return CustomShimmer.rectangular(
+            height: 55.h,
+            width: 592.w,
+            borderRadius: BorderRadius.circular(15.r),
+          );
+        }
+        if (state is AcademicYearError) {
+          return RetryWidget(
+            title: state.message,
+            onPressed: () {
+              AcademicYearCubit.get(context).fetchAcademicYears();
+            },
+          );
+        }
+        if (state is AcademicYearSuccess) {
+          final academicYearCubit = AcademicYearCubit.get(context);
+          final List<int> yearNumbers = state.academicYears
+              .map((e) => e.yearNumber)
+              .toSet()
+              .toList();
+
+          final int? selectedYearNumber =
+              state.selectedAcademicYear?.yearNumber;
+          return CustomDropButton(
+            dropButtonModel: DropButtonModel(
+              selectedData: selectedYearNumber,
+              listOfData: yearNumbers,
+              hintText: state.academicYears.isEmpty
+                  ? "noYears".tr()
+                  : "selectedYear".tr(),
+              hintSize: 20.sp,
+              onChanged: (value) {
+                if (value == null) return;
+                final selectedModel = state.academicYears.firstWhere(
+                  (d) => d.yearNumber == value,
+                );
+                // This triggers the BlocListener in InstitutionalAccreditationBody
+                // which will automatically fetch the accreditations.
+                academicYearCubit.selectAcademicYear(
+                  academicYear: selectedModel,
+                );
+              },
+            ),
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
+}
