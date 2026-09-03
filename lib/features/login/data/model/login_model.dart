@@ -1,4 +1,5 @@
 import '../../../../core/all_core_imports/all_core_imports.dart';
+import '../../domain/entities/user_entity.dart';
 
 class LoginModel {
   final LoginDataModel? data;
@@ -81,6 +82,18 @@ class LoginDataModel {
       refreshTokenExpiration:
           refreshTokenExpiration ?? this.refreshTokenExpiration,
       isActive: isActive ?? this.isActive,
+    );
+  }
+
+  UserEntity toEntity() {
+    return UserEntity(
+      userId: userId,
+      email: email,
+      role: role,
+      token: token,
+      refreshToken: refreshToken,
+      refreshTokenExpiration: refreshTokenExpiration,
+      isActive: isActive,
     );
   }
 }

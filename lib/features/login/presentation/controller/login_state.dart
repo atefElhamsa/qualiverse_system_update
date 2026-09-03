@@ -1,4 +1,4 @@
-import 'package:qualiverse_system/features/all_features_imports/all_features_imports.dart';
+import '../../domain/entities/user_entity.dart';
 
 sealed class LoginState {}
 
@@ -7,7 +7,7 @@ final class LoginInitial extends LoginState {}
 final class LoginLoading extends LoginState {}
 
 final class LoginSuccess extends LoginState {
-  final LoginDataModel user;
+  final UserEntity user;
 
   LoginSuccess({required this.user});
 }

@@ -16,9 +16,14 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   @override
-  void initState() {
-    super.initState();
-    MeCubit.get(context).getMyInfo();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Using didChangeDependencies to avoid calling setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && LoginStorage.hasToken) {
+        MeCubit.get(context).getMyInfo();
+      }
+    });
   }
 
   @override

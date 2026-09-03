@@ -3,20 +3,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qualiverse_system/routing/all_routes_imports.dart';
+import '../../domain/usecases/login_usecase.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit() : super(LoginInitial());
+  final LoginUseCase loginUseCase;
 
-  final userNameOrEmailController = TextEditingController();
-  final passwordController = TextEditingController();
+  LoginCubit({required this.loginUseCase}) : super(LoginInitial());
 
-  final userNameOrEmailNode = FocusNode();
-  final passwordNode = FocusNode();
   bool rememberMe = false;
 
   static LoginCubit get(BuildContext context) => BlocProvider.of(context);
-
-  LoginServices loginServices = LoginServices();
 
   void toggleRememberMe({required bool value}) {
     rememberMe = value;
@@ -28,12 +24,14 @@ class LoginCubit extends Cubit<LoginState> {
 
   Future<bool> checkInternet() async {
     final conn = await Connectivity().checkConnectivity();
-    return conn != ConnectivityResult.none;
+    return !conn.contains(ConnectivityResult.none);
   }
 
-  Future<void> loginCubit(BuildContext context) async {
-    if (userNameOrEmailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
+  Future<void> login({
+    required String userNameOrEmail,
+    required String password,
+  }) async {
+    if (userNameOrEmail.isEmpty || password.isEmpty) {
       emit(LoginFailure(errorMessage: "fillAllFields".tr()));
       return;
     }
@@ -45,9 +43,9 @@ class LoginCubit extends Cubit<LoginState> {
 
     try {
       emit(LoginLoading());
-      final result = await loginServices.login(
-        userNameOrEmail: userNameOrEmailController.text.trim(),
-        password: passwordController.text.trim(),
+      final result = await loginUseCase(
+        userNameOrEmail: userNameOrEmail,
+        password: password,
       );
 
       LoginStorage.setSession(
@@ -60,13 +58,9 @@ class LoginCubit extends Cubit<LoginState> {
         await LoginStorage.savePersistent();
       }
 
-      await CashHelper.saveData(
-        key: KeysTexts.userPassword,
-        value: passwordController.text.trim(),
-      );
+      await CashHelper.saveData(key: KeysTexts.userPassword, value: password);
 
       emit(LoginSuccess(user: result));
-      context.read<SettingCubit>().refreshUserData();
     } catch (e) {
       emit(
         LoginFailure(
@@ -74,14 +68,5 @@ class LoginCubit extends Cubit<LoginState> {
         ),
       );
     }
-  }
-
-  @override
-  Future<void> close() {
-    userNameOrEmailController.dispose();
-    passwordController.dispose();
-    userNameOrEmailNode.dispose();
-    passwordNode.dispose();
-    return super.close();
   }
 }

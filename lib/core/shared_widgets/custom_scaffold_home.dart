@@ -28,14 +28,20 @@ class CustomScaffoldHome extends StatelessWidget {
           ),
         ),
         SizedBox(height: 12.h),
-        IconButton(
-          onPressed: () {
-            controller.showDrawer();
-          },
-          icon: Image.asset(
-            AppImages.drawerImage,
-            width: 35.w,
-            fit: BoxFit.contain,
+        MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () {
+              controller.showDrawer();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                AppImages.drawerImage,
+                width: 35.w,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
         ),
       ],

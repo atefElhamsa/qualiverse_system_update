@@ -6,9 +6,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:qualiverse_system/routing/all_routes_imports.dart';
 
 class LoginButtonWidget extends StatelessWidget {
-  const LoginButtonWidget({super.key, required this.loginCubit});
+  const LoginButtonWidget({
+    super.key,
+    required this.loginCubit,
+    required this.userNameOrEmailController,
+    required this.passwordController,
+  });
 
   final LoginCubit loginCubit;
+  final TextEditingController userNameOrEmailController;
+  final TextEditingController passwordController;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +29,10 @@ class LoginButtonWidget extends StatelessWidget {
                 child: CustomButton(
                   buttonModel: ButtonModel(
                     onPressed: () {
-                      loginCubit.loginCubit(context);
+                      loginCubit.login(
+                        userNameOrEmail: userNameOrEmailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      );
                     },
                     backgroundColor: AppColors.loginButtonColor,
                     radius: 4,

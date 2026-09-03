@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:phosphoricons_flutter/phosphoricons_flutter.dart';
 import '../../../../../../routing/all_routes_imports.dart';
 
 class DashboardOverview extends StatefulWidget {
@@ -119,7 +119,7 @@ class _DashboardOverviewState extends State<DashboardOverview> {
                             title: 'totalCourses'.tr(),
                             value: totals.totalCourses.toString(),
                             subtitle: 'allLevels'.tr(),
-                            icon: PhosphorIcons.student(),
+                            icon: PhosphorIcons.student,
                             iconColor: AppColors.blue,
                             iconBgColor: AppColors.blue.withOpacity(0.1),
                             delay: 0,
@@ -131,7 +131,7 @@ class _DashboardOverviewState extends State<DashboardOverview> {
                             title: 'totalIndicators'.tr(),
                             value: totals.totalIndicators.toString(),
                             subtitle: '',
-                            icon: PhosphorIcons.target(),
+                            icon: PhosphorIcons.target,
                             iconColor: AppColors.green,
                             iconBgColor: AppColors.green.withOpacity(0.1),
                             delay: 100,
@@ -142,7 +142,7 @@ class _DashboardOverviewState extends State<DashboardOverview> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   DashboardMiniBadge(
-                                    icon: PhosphorIcons.monitor(),
+                                    icon: PhosphorIcons.monitor,
                                     value: totals.programmaticIndicators
                                         .toString(),
                                     label: 'programmatic'.tr(),
@@ -151,7 +151,7 @@ class _DashboardOverviewState extends State<DashboardOverview> {
                                   ),
                                   SizedBox(width: 8.w),
                                   DashboardMiniBadge(
-                                    icon: PhosphorIcons.bank(),
+                                    icon: PhosphorIcons.bank,
                                     value: totals.institutionalIndicators
                                         .toString(),
                                     label: 'institutional'.tr(),
@@ -169,7 +169,7 @@ class _DashboardOverviewState extends State<DashboardOverview> {
                             title: 'totalFilesUploaded'.tr(),
                             value: totals.totalFiles.toString(),
                             subtitle: 'allTypes'.tr(),
-                            icon: PhosphorIcons.fileText(),
+                            icon: PhosphorIcons.fileText,
                             iconColor: Colors.deepPurple,
                             iconBgColor: Colors.deepPurple.withOpacity(0.1),
                             delay: 200,
@@ -181,7 +181,7 @@ class _DashboardOverviewState extends State<DashboardOverview> {
                             title: 'totalUsers'.tr(),
                             value: totals.totalUsers.toString(),
                             subtitle: 'activeUsers'.tr(),
-                            icon: PhosphorIcons.users(),
+                            icon: PhosphorIcons.users,
                             iconColor: AppColors.orange,
                             iconBgColor: AppColors.orange.withOpacity(0.1),
                             delay: 300,

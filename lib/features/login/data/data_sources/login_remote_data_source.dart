@@ -1,9 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:qualiverse_system/routing/all_routes_imports.dart';
 
-class LoginServices {
-  final Dio dio = ApiClient.dio;
+abstract class LoginRemoteDataSource {
+  Future<LoginDataModel> login({
+    required String userNameOrEmail,
+    required String password,
+  });
+}
 
+class LoginRemoteDataSourceImpl implements LoginRemoteDataSource {
+  final Dio dio;
+
+  LoginRemoteDataSourceImpl({required this.dio});
+
+  @override
   Future<LoginDataModel> login({
     required String userNameOrEmail,
     required String password,
@@ -15,7 +25,6 @@ class LoginServices {
       );
 
       var data = response.data;
-
       final result = LoginModel.fromJson(data);
 
       if (!result.isSuccess) {
@@ -26,10 +35,8 @@ class LoginServices {
     } on DioException catch (e) {
       if (e.response?.data != null) {
         final result = LoginModel.fromJson(e.response!.data);
-
         throw Exception(result.error?.description ?? "Server error");
       }
-
       throw Exception("No Internet Connection");
     } catch (e) {
       throw Exception(e.toString().replaceFirst("Exception: ", "").trim());

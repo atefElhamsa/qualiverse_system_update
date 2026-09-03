@@ -8,9 +8,20 @@ import 'package:qualiverse_system/features/all_features_imports/all_features_imp
 import 'package:qualiverse_system/features/login/presentation/view/widgets/update_prompt_helper.dart';
 
 class FieldsWidget extends StatelessWidget {
-  const FieldsWidget({super.key, required this.loginCubit});
+  const FieldsWidget({
+    super.key,
+    required this.loginCubit,
+    required this.userNameOrEmailController,
+    required this.passwordController,
+    required this.userNameOrEmailNode,
+    required this.passwordNode,
+  });
 
   final LoginCubit loginCubit;
+  final TextEditingController userNameOrEmailController;
+  final TextEditingController passwordController;
+  final FocusNode userNameOrEmailNode;
+  final FocusNode passwordNode;
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +41,11 @@ class FieldsWidget extends StatelessWidget {
               ),
               onTap: () => UpdatePromptHelper.checkUpdateAndPrompt(context),
               onFieldSubmitted: (submit) {
-                FocusScope.of(context).requestFocus(loginCubit.passwordNode);
+                FocusScope.of(context).requestFocus(passwordNode);
               },
               hintText: "enterUserNameOrEmail".tr(),
-              controller: loginCubit.userNameOrEmailController,
-              focusNode: loginCubit.userNameOrEmailNode,
+              controller: userNameOrEmailController,
+              focusNode: userNameOrEmailNode,
               keyboardType: TextInputType.emailAddress,
               validator: (emailOrUserName) =>
                   MyValidators.userNameOrEmailValidator(emailOrUserName),
@@ -54,13 +65,16 @@ class FieldsWidget extends StatelessWidget {
                   fontWeight: FontWeight.w300,
                 ),
               ),
-              focusNode: loginCubit.passwordNode,
+              focusNode: passwordNode,
               isObscured: true,
               onFieldSubmitted: (submit) {
-                loginCubit.loginCubit(context);
+                loginCubit.login(
+                  userNameOrEmail: userNameOrEmailController.text.trim(),
+                  password: passwordController.text.trim(),
+                );
               },
               hintText: "enterPassword".tr(),
-              controller: loginCubit.passwordController,
+              controller: passwordController,
               keyboardType: TextInputType.visiblePassword,
               validator: (password) => MyValidators.passwordValidator(password),
             ),

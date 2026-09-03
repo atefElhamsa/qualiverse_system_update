@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:qualiverse_system/core/all_core_imports/all_core_imports.dart';
-import 'package:qualiverse_system/features/all_features_imports/all_features_imports.dart';
 import 'package:qualiverse_system/features/login/presentation/view/widgets/update_prompt_helper.dart';
+import '../../domain/usecases/login_usecase.dart';
+import '../../data/repositories/login_repository_impl.dart';
+import '../../data/data_sources/login_remote_data_source.dart';
+import 'package:qualiverse_system/routing/all_routes_imports.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +25,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginCubit(),
+      create: (context) {
+        final dio = ApiClient.dio;
+        final remoteDataSource = LoginRemoteDataSourceImpl(dio: dio);
+        final repository = LoginRepositoryImpl(
+          remoteDataSource: remoteDataSource,
+        );
+        final useCase = LoginUseCase(repository);
+        return LoginCubit(loginUseCase: useCase);
+      },
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor:

@@ -5,8 +5,29 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:qualiverse_system/routing/all_routes_imports.dart';
 
-class LoginFieldAndBigImageWidget extends StatelessWidget {
+class LoginFieldAndBigImageWidget extends StatefulWidget {
   const LoginFieldAndBigImageWidget({super.key});
+
+  @override
+  State<LoginFieldAndBigImageWidget> createState() =>
+      _LoginFieldAndBigImageWidgetState();
+}
+
+class _LoginFieldAndBigImageWidgetState
+    extends State<LoginFieldAndBigImageWidget> {
+  final userNameOrEmailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final userNameOrEmailNode = FocusNode();
+  final passwordNode = FocusNode();
+
+  @override
+  void dispose() {
+    userNameOrEmailController.dispose();
+    passwordController.dispose();
+    userNameOrEmailNode.dispose();
+    passwordNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +42,7 @@ class LoginFieldAndBigImageWidget extends StatelessWidget {
           countCubit.getUnreadCount();
           countCubit.startPolling();
           context.read<MeCubit>().getMyInfo();
+          context.read<SettingCubit>().refreshUserData();
           context.pushReplacementNamed(AppRoutes.homeScreen);
         }
       },
@@ -37,11 +59,21 @@ class LoginFieldAndBigImageWidget extends StatelessWidget {
                   children: [
                     const NotConfirmedWidget(),
                     const SizedBox(height: 10),
-                    FieldsWidget(loginCubit: loginCubit),
+                    FieldsWidget(
+                      loginCubit: loginCubit,
+                      userNameOrEmailController: userNameOrEmailController,
+                      passwordController: passwordController,
+                      userNameOrEmailNode: userNameOrEmailNode,
+                      passwordNode: passwordNode,
+                    ),
                     const SizedBox(height: 10),
                     KeepLoginWidget(loginCubit: loginCubit),
                     const SizedBox(height: 20),
-                    LoginButtonWidget(loginCubit: loginCubit),
+                    LoginButtonWidget(
+                      loginCubit: loginCubit,
+                      userNameOrEmailController: userNameOrEmailController,
+                      passwordController: passwordController,
+                    ),
                   ],
                 ),
               ),

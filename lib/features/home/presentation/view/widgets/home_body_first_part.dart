@@ -26,30 +26,32 @@ class HomeBodyFirstPart extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           if (!isDrawerVisible)
-            CustomScaffoldHome(
-              controller: inherited.controller,
-            ).animate().fadeIn(duration: 500.ms).slideX(begin: -0.2, end: 0)
+            CustomScaffoldHome(controller: inherited.controller)
           else
             const SizedBox(),
           const Spacer(),
-          IconButton(
-            onPressed: () {
-              final cubit = SettingCubit.get(context);
-              if (context.locale.languageCode == 'en') {
-                cubit.changeLanguage(lang: 'ar', context: context);
-              } else {
-                cubit.changeLanguage(lang: 'en', context: context);
-              }
-            },
-            icon: Icon(
-              Icons.language_rounded,
-              color: AppColors.mainBlack,
-              size: 28.sp,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: IconButton(
+              onPressed: () {
+                final cubit = SettingCubit.get(context);
+                if (context.locale.languageCode == 'en') {
+                  cubit.changeLanguage(lang: 'ar', context: context);
+                } else {
+                  cubit.changeLanguage(lang: 'en', context: context);
+                }
+              },
+              icon: Icon(
+                Icons.language_rounded,
+                color: AppColors.mainBlack,
+                size: 28.sp,
+              ),
             ),
           ).animate().fadeIn(delay: 100.ms).scale(curve: Curves.easeOutBack),
           const SizedBox(width: 8),
-          const NotificationIconWithBadge(
-            notificationCount: 3,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: const NotificationIconWithBadge(notificationCount: 3),
           ).animate().fadeIn(delay: 200.ms).scale(curve: Curves.easeOutBack),
           const SizedBox(width: 16),
           _buildPillButton(
@@ -79,27 +81,30 @@ class HomeBodyFirstPart extends StatelessWidget {
     required VoidCallback onPressed,
     required Duration delay,
   }) {
-    return SizedBox(
-      width: 200.w,
-      height: 65.h,
-      child: CustomButton(
-        buttonModel: ButtonModel(
-          onPressed: onPressed,
-          backgroundColor: color,
-          radius: 32.5,
-          customText: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: CustomText(
-              title: title.tr(),
-              textStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                fontSize: 22.sp,
-                fontWeight: FontWeight.w800,
-                color: AppColors.white,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: SizedBox(
+        width: 200.w,
+        height: 65.h,
+        child: CustomButton(
+          buttonModel: ButtonModel(
+            onPressed: onPressed,
+            backgroundColor: color,
+            radius: 32.5,
+            customText: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: CustomText(
+                title: title.tr(),
+                textStyle: Theme.of(context).textTheme.headlineLarge!.copyWith(
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.white,
+                ),
               ),
             ),
           ),
         ),
-      ),
-    ).animate().fadeIn(delay: delay).slideX(begin: 0.1, end: 0);
+      ).animate().fadeIn(delay: delay).slideX(begin: 0.1, end: 0),
+    );
   }
 }
